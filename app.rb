@@ -1,6 +1,6 @@
 require 'sinatra'
 require 'json'
-require 'tilt/erubis'
+require 'tilt/erb'
 
 class OAuth2
   CLIENT_ID = 'zm2adpwtdxiph3m'.freeze
