@@ -1,5 +1,6 @@
 require 'sinatra'
 require 'json'
+require 'tilt/erubis'
 
 class OAuth2
   CLIENT_ID = 'zm2adpwtdxiph3m'.freeze
@@ -37,11 +38,19 @@ before '/authorize' do
   end
 end
 
-get '/authorize' do
+before '/api/*' do
+  # Check the access token
+  unless "Bearer #{OAuth2::ACCESS_TOKEN}" == request.env['HTTP_AUTHORIZATION']
+    unauthorized_request
+  end
+end
+
+#-- Authorization endpoints
+get '/authorize/?' do
   erb :authorize
 end
 
-post '/authorize_submit' do
+post '/authorize_submit/?' do
   # Redirect the user to root if he or she denied access
   redirect to '/' if params['deny']
 
@@ -54,6 +63,23 @@ post '/authorize_submit' do
   redirect params['redirect_uri']
 end
 
+#-- Endpoints
+# https://api.github.com/zen
+get 'api/zen/?' do
+  quotes = ['Practicality beats purity.', 'Favor focus over features.',
+            'It\'s not fully shipped until it\'s fast.',
+            'Keep it logically awesome.', 'Responsive is better than fast.',
+            'Half measures are as bad as nothing at all.']
+
+  halt 200, { 'Content-Type' => 'text/plain' }, quotes.sample
+end
+
+#-- Response helpers
 private def bad_request(message)
   halt 400, erb(:error, locals: { message: message })
+end
+
+private def unauthorized_request
+  error = { success: false, message: 'Unauthorized access.' }
+  halt 401, { 'Content-Type' => 'application/json' }, error.to_json
 end
