@@ -15,7 +15,9 @@
           <button type="submit" class="btn btn-primary" name="allow" value="1">
             Allow
           </button>
-          </div>
+        </div>
+        <%# Retain the response type from the previous request. %>
+        <input type="hidden" name="response_type" value="<%= response_type %>">
       </form>
   </div>
 </div>

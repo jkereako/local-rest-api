@@ -8,11 +8,19 @@ class OAuth2
   REDIRECT_URI = 'myapp://com.myapp.project'.freeze
 end
 
-get '/' do
-  erb :index
+#-- Filters
+before '/*/?' do
+  # Skip these paths
+  pass if request.path_info == '/'
+  pass if %w( authorize authorize_submit).include? request.path_info.split('/')[1]
+
+  # Check the access token
+  unless "Bearer #{OAuth2::ACCESS_TOKEN}" == request.env['HTTP_AUTHORIZATION']
+    unauthorized_request
+  end
 end
 
-before '/authorize' do
+before '/authorize/?' do
   # Check `client_id`
   bad_request 'Missing parameter client_id' unless params['client_id']
 
@@ -38,16 +46,13 @@ before '/authorize' do
   end
 end
 
-before '/api/*' do
-  # Check the access token
-  unless "Bearer #{OAuth2::ACCESS_TOKEN}" == request.env['HTTP_AUTHORIZATION']
-    unauthorized_request
-  end
+get '/' do
+  erb :index, locals: { url: request.url, access_token: OAuth2::ACCESS_TOKEN }
 end
 
 #-- Authorization endpoints
 get '/authorize/?' do
-  erb :authorize
+  erb :authorize, locals: { response_type: params['response_type'] }
 end
 
 post '/authorize_submit/?' do
@@ -55,17 +60,17 @@ post '/authorize_submit/?' do
   redirect to '/' if params['deny']
 
   # Display the access token if the asked for a code
-  if params['response_type'] != 'code'
+  if params['response_type'] == 'code'
     erb :authorize_submit, locals: { access_token: OAuth2::ACCESS_TOKEN }
-  end
-
   # Else, rediect the user to the `redirect_uri`
-  redirect params['redirect_uri']
+  else
+    redirect params['redirect_uri']
+  end
 end
 
 #-- Endpoints
 # https://api.github.com/zen
-get 'api/zen/?' do
+get '/zen/?' do
   quotes = ['Practicality beats purity.', 'Favor focus over features.',
             'It\'s not fully shipped until it\'s fast.',
             'Keep it logically awesome.', 'Responsive is better than fast.',
