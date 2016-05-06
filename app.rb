@@ -1,5 +1,6 @@
 require 'sinatra'
 require 'json'
+require 'uri'
 require 'tilt/erb'
 require File.expand_path('../lib/authorization', __FILE__)
 
@@ -42,7 +43,12 @@ before '/authorize/?' do
 end
 
 get '/' do
-  erb :index, locals: { url: request.url, access_token: Authorization::ACCESS_TOKEN }
+  uri = URI.parse request.url
+  url = "#{uri.scheme}://#{uri.host}:#{uri.port}"
+  auth_url = "#{url}/authorize?client_id=#{Authorization::CLIENT_ID}&response_type=code"
+  erb :index, locals: { auth_url: auth_url,
+                        url: url,
+                        access_token: Authorization::ACCESS_TOKEN }
 end
 
 #-- Authorization endpoints
