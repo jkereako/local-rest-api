@@ -12,4 +12,8 @@ helpers do
   def authorize_url(root_url)
     "#{root_url}/authorize?client_id=#{Authorization::CLIENT_ID}&response_type=code"
   end
+
+  def static_dir(path = '')
+    File.expand_path('../../static', __FILE__) + path
+  end
 end

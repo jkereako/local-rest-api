@@ -35,10 +35,7 @@ end
 #-- Endpoints
 # https://api.github.com/zen
 get '/zen/?' do
-  quotes = ['Practicality beats purity.', 'Favor focus over features.',
-            'It\'s not fully shipped until it\'s fast.',
-            'Keep it logically awesome.', 'Responsive is better than fast.',
-            'Half measures are as bad as nothing at all.']
+  quotes = YAML.load_file static_dir '/yaml/quotes.yml'
 
   halt 200, { 'Content-Type' => 'text/plain' }, quotes.sample
 end
