@@ -1,5 +1,6 @@
 require 'sinatra'
 require File.expand_path('../../helpers/response_helper', __FILE__)
+require File.expand_path('../../lib/authorization', __FILE__)
 
 #-- Filters
 before '/*/?' do
@@ -24,7 +25,7 @@ before '/authorize/?' do
   # Check `response_type`
   bad_request 'Missing response_type' unless params['response_type']
 
-  if params['response_type'] != 'code' && params['response_type'] != 'token'
+  unless Authorization::RESPONSE_TYPES.include? params['response_type']
     bad_request "Invalid response_type '#{params['response_type']}'"
   end
 
