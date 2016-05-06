@@ -73,7 +73,7 @@ RSpec.describe 'Authorization', type: 'routing' do
                         response_type: @response_type,
                         redirect_uri: 'notreal'
             end
-            
+
             it { is_expected.to_not be_ok }
           end
         end
