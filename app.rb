@@ -1,53 +1,16 @@
 require 'sinatra'
 require 'json'
-require 'uri'
 require 'tilt/erb'
 require File.expand_path('../lib/authorization', __FILE__)
-
-#-- Filters
-before '/*/?' do
-  # Skip these paths
-  pass if request.path_info == '/'
-  pass if %w( authorize authorize_submit).include? request.path_info.split('/')[1]
-
-  # Check the access token
-  unless "Bearer #{Authorization::ACCESS_TOKEN}" == request.env['HTTP_AUTHORIZATION']
-    unauthorized_request
-  end
-end
-
-before '/authorize/?' do
-  # Check `client_id`
-  bad_request 'Missing parameter client_id' unless params['client_id']
-
-  unless params['client_id'] == Authorization::CLIENT_ID
-    bad_request "Invalid client_id '#{params['client_id']}'"
-  end
-
-  # Check `response_type`
-  bad_request 'Missing response_type' unless params['response_type']
-
-  if params['response_type'] != 'code' && params['response_type'] != 'token'
-    bad_request "Invalid response_type '#{params['response_type']}'"
-  end
-
-  # Check `redirect_uri`
-  if params['response_type'] == 'token' && !params['redirect_uri']
-    bad_request 'Missing redirect_uri (required when "response_type" is "token")'
-
-  elsif params['response_type'] == 'token' && params['redirect_uri']
-    if params['redirect_uri'] != Authorization::REDIRECT_URI
-      bad_request "Invalid redirect_uri '#{params['redirect_uri']}'"
-    end
-  end
-end
+require File.expand_path('../helpers/app_helper', __FILE__)
+require File.expand_path('../filters/app_filter', __FILE__)
 
 get '/' do
-  uri = URI.parse request.url
-  url = "#{uri.scheme}://#{uri.host}:#{uri.port}"
-  auth_url = "#{url}/authorize?client_id=#{Authorization::CLIENT_ID}&response_type=code"
+  url = root_url request.url
+  auth_url = authorize_url url
+
   erb :index, locals: { auth_url: auth_url,
-                        url: url,
+                        url: root_url(request.url),
                         access_token: Authorization::ACCESS_TOKEN }
 end
 
@@ -78,14 +41,4 @@ get '/zen/?' do
             'Half measures are as bad as nothing at all.']
 
   halt 200, { 'Content-Type' => 'text/plain' }, quotes.sample
-end
-
-#-- Response helpers
-private def bad_request(message)
-  halt 400, erb(:error, locals: { message: message })
-end
-
-private def unauthorized_request
-  error = { success: false, message: 'Unauthorized access.' }
-  halt 401, { 'Content-Type' => 'application/json' }, error.to_json
 end
