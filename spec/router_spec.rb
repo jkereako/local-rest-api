@@ -28,4 +28,15 @@ RSpec.describe 'API', type: 'routing' do
       it { is_expected.to_not be_ok }
     end
   end
+
+  describe 'authenticated request for' do
+    before :all do
+      header 'Authorization', "Bearer #{Authorization::ACCESS_TOKEN}"
+    end
+
+    context '"/zen"' do
+      subject { get '/zen' }
+      it { is_expected.to be_ok }
+    end
+  end
 end

@@ -1,12 +1,7 @@
 require 'sinatra'
 require 'json'
 require 'tilt/erb'
-
-class OAuth2
-  CLIENT_ID = 'zm2adpwtdxiph3m'.freeze
-  ACCESS_TOKEN = 'HRD2VjScOqAAAAmwZ-DSI_SL1EVO-AQSYhQDXUWsQ9G2Bp_d3LGhj3'.freeze
-  REDIRECT_URI = 'myapp://com.myapp.project'.freeze
-end
+require File.expand_path('../lib/authorization', __FILE__)
 
 #-- Filters
 before '/*/?' do
@@ -15,7 +10,7 @@ before '/*/?' do
   pass if %w( authorize authorize_submit).include? request.path_info.split('/')[1]
 
   # Check the access token
-  unless "Bearer #{OAuth2::ACCESS_TOKEN}" == request.env['HTTP_AUTHORIZATION']
+  unless "Bearer #{Authorization::ACCESS_TOKEN}" == request.env['HTTP_AUTHORIZATION']
     unauthorized_request
   end
 end
@@ -24,7 +19,7 @@ before '/authorize/?' do
   # Check `client_id`
   bad_request 'Missing parameter client_id' unless params['client_id']
 
-  unless params['client_id'] == OAuth2::CLIENT_ID
+  unless params['client_id'] == Authorization::CLIENT_ID
     bad_request "Invalid client_id '#{params['client_id']}'"
   end
 
@@ -40,14 +35,14 @@ before '/authorize/?' do
     bad_request 'Missing redirect_uri (required when "response_type" is "token")'
 
   elsif params['response_type'] == 'token' && params['redirect_uri']
-    if params['redirect_uri'] != OAuth2::REDIRECT_URI
+    if params['redirect_uri'] != Authorization::REDIRECT_URI
       bad_request "Invalid redirect_uri '#{params['redirect_uri']}'"
     end
   end
 end
 
 get '/' do
-  erb :index, locals: { url: request.url, access_token: OAuth2::ACCESS_TOKEN }
+  erb :index, locals: { url: request.url, access_token: Authorization::ACCESS_TOKEN }
 end
 
 #-- Authorization endpoints
@@ -61,7 +56,7 @@ post '/authorize_submit/?' do
 
   # Display the access token if the asked for a code
   if params['response_type'] == 'code'
-    erb :authorize_submit, locals: { access_token: OAuth2::ACCESS_TOKEN }
+    erb :authorize_submit, locals: { access_token: Authorization::ACCESS_TOKEN }
   # Else, rediect the user to the `redirect_uri`
   else
     redirect params['redirect_uri']
