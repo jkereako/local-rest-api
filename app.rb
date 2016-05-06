@@ -1,5 +1,4 @@
 require 'sinatra'
-require 'json'
 require 'tilt/erb'
 require File.expand_path('../lib/authorization', __FILE__)
 require File.expand_path('../helpers/app_helper', __FILE__)
@@ -37,5 +36,5 @@ end
 get '/zen/?' do
   quotes = YAML.load_file static_dir '/yaml/quotes.yml'
 
-  halt 200, { 'Content-Type' => 'text/plain' }, quotes.sample
+  normal_response quotes.sample
 end
