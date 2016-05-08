@@ -49,6 +49,10 @@ simple, I statically defined all these data as class constants. Change them as y
 - - **`code`**: The OAuth2 server simply returns the token as text. This server 
     displays the token in a text field for the user to copy, just like Dropbox.
 
+When you request a token from this OAuth2 service, all of the corresponding parameters
+must match what exists in the database (i.e. the class `Authorization`). If there is
+a mis-match or if required fields are missing, then the service will deny the request.
+
 [Sinatra]: http://www.sinatrarb.com/
 [Bundler]: http://bundler.io/
 [Dropbox]: https://www.dropbox.com/developers-v1/core/docs
