@@ -1,6 +1,8 @@
 # Local OAuth2 REST API
-This is a simple implementation of an OAuth2 API that you can run on your local
-machine.
+This is a simple, local implementation of an OAuth2 API built on [Sinatra]
+[Sinatra].
+
+Inspired by [Dropbox's API][Dropbox].
 
 # Requirements
 The only hard requirement is Ruby 2.3.0, all other dependencies are declared in
@@ -30,5 +32,23 @@ Puma starting in single mode...
 Use Ctrl-C to stop
 ```
 
+# Quick rundown
+The class `Authorization` represents a database with user defined data. To keep things
+simple, I statically defined all these data as class constants. Change them as you wish.
+
+- **`CLIENT_ID`**: This represents the "app key" you'll often see with OAuth2 services.
+  This is usually accompanied by an "app secret", I don't know what the difference is.
+- **`REDIRECT_URI`**: This is the URI that the OAuth2 service will redirect to after
+  the user has been authorized. The redirect URI has got to be something your client
+  application recognizes.
+- **`ACCESS_TOKEN`**: This is the token the server recognizes as the authorized user.
+  Below are "response types" which tell the OAuth2 service how the client application
+  would like to receive the token:
+- - **`token`**: This is the most commonly used response type. It redirects the user to
+    the `redirect_uri` and passes, via the query string, the token.
+- - **`code`**: The OAuth2 server simply returns the token as text. This server 
+    displays the token in a text field for the user to copy, just like Dropbox.
+
 [Sinatra]: http://www.sinatrarb.com/
 [Bundler]: http://bundler.io/
+[Dropbox]: https://www.dropbox.com/developers-v1/core/docs
