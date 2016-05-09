@@ -44,9 +44,9 @@ simple, I statically defined all these data as class constants. Change them as y
 - **`ACCESS_TOKEN`**: This is the token the server recognizes as the authorized user.
   Below are "response types" which tell the OAuth2 service how the client application
   would like to receive the token:
-- - **`token`**: This is the most commonly used response type. It redirects the user to
+  - **`token`**: This is the most commonly used response type. It redirects the user to
     the `redirect_uri` and passes, via the query string, the token.
-- - **`code`**: The OAuth2 server simply returns the token as text. This server 
+  - **`code`**: The OAuth2 server simply returns the token as text. This server 
     displays the token in a text field for the user to copy, just like Dropbox.
 
 When you request a token from this OAuth2 service, all of the corresponding parameters
