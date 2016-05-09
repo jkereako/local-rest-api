@@ -46,8 +46,9 @@ simple, I statically defined all these data as class constants. Change them as y
   would like to receive the token:
   - **`token`**: This is the most commonly used response type. It redirects the user to
     the `redirect_uri` and passes, via the query string, the token.
-  - **`code`**: The OAuth2 server simply returns the token as text. This server 
-    displays the token in a text field for the user to copy, just like Dropbox.
+  - **`code`**: The OAuth2 server returns an access code as text. This access code is
+    then used to query the path `/token` to receive the access token. This 2 step process
+    is often used with server based apps.
 
 When you request a token from this OAuth2 service, all of the corresponding parameters
 must match what exists in the database (i.e. the class `Authorization`). If there is
