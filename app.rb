@@ -1,3 +1,5 @@
+require 'yaml'
+require 'uri'
 require 'sinatra'
 require 'tilt/erb'
 require File.expand_path('../lib/authorization', __FILE__)
@@ -15,7 +17,9 @@ end
 
 #-- Authorization endpoints
 get '/authorize/?' do
-  erb :authorize, locals: { response_type: params['response_type'] }
+  erb :authorize, locals: {
+    response_type: params['response_type'], state: params['state']
+  }
 end
 
 post '/authorize_submit/?' do
@@ -27,7 +31,13 @@ post '/authorize_submit/?' do
     erb :authorize_submit, locals: { access_token: Authorization::ACCESS_TOKEN }
   # Else, rediect the user to the `redirect_uri`
   else
-    redirect params['redirect_uri']
+    args = [
+      ['access_token', Authorization::ACCESS_TOKEN], %w(token_type bearer)
+    ]
+
+    args.push ['state', params['state']] if params['state']
+    # myapp://com.myapp.project/#access_token=HRD2VjS...&token_type=bearer&state=this+is+a+test
+    redirect "#{Authorization::REDIRECT_URI}/##{URI.encode_www_form args}"
   end
 end
 

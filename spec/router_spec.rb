@@ -10,22 +10,38 @@ RSpec.describe 'API', type: 'routing' do
   describe 'unauthenticated request for' do
     context '"/root"' do
       subject { get '/' }
-      it { is_expected.to be_ok }
+
+      specify do
+        expect(subject.status).to eq 200
+        expect(subject.header['Content-Type']).to include 'text/html'
+      end
     end
 
     context '"/authorize"' do
       subject { get '/authorize' }
-      it { is_expected.to_not be_ok }
+
+      specify do
+        expect(subject.status).to eq 400
+        expect(subject.header['Content-Type']).to include 'text/html'
+      end
     end
 
     context '"/authorize_submit"' do
       subject { get '/authorize_submit' }
-      it { is_expected.to_not be_ok }
+
+      specify do
+        expect(subject.status).to eq 404
+        expect(subject.header['Content-Type']).to include 'text/html'
+      end
     end
 
     context '"/zen"' do
       subject { get '/zen' }
-      it { is_expected.to_not be_ok }
+
+      specify do
+        expect(subject.status).to eq 401
+        expect(subject.header['Content-Type']).to include 'application/json'
+      end
     end
   end
 
@@ -36,7 +52,11 @@ RSpec.describe 'API', type: 'routing' do
 
     context '"/zen"' do
       subject { get '/zen' }
-      it { is_expected.to be_ok }
+
+      specify do
+        expect(subject.status).to eq 200
+        expect(subject.header['Content-Type']).to include 'application/json'
+      end
     end
   end
 end

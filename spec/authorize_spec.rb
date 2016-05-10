@@ -16,20 +16,32 @@ RSpec.describe 'Authorization', type: 'routing' do
     # http://localhost:4567/authorize
     context 'without "client_id"' do
       subject { get @url }
-      it { is_expected.to_not be_ok }
+
+      specify do
+        expect(subject.status).to eq 400
+        expect(subject.header['Content-Type']).to include 'text/html'
+      end
     end
 
     # http://localhost:4567/authorize?client_id=<bad_value>
     context 'with incorrect "client_id"' do
       subject { get @url, client_id: 'notreal' }
-      it { is_expected.to_not be_ok }
+
+      specify do
+        expect(subject.status).to eq 400
+        expect(subject.header['Content-Type']).to include 'text/html'
+      end
     end
 
     context 'with "client_id" and' do
       # /authorize?client_id=<value>
       context 'without "response_type"' do
         subject { get @url, client_id: Authorization::CLIENT_ID }
-        it { is_expected.to_not be_ok }
+
+        specify do
+          expect(subject.status).to eq 400
+          expect(subject.header['Content-Type']).to include 'text/html'
+        end
       end
 
       # /authorize?client_id=<value>&response_type=<bad_value>
@@ -39,7 +51,10 @@ RSpec.describe 'Authorization', type: 'routing' do
                     response_type: 'notreal'
         end
 
-        it { is_expected.to_not be_ok }
+        specify do
+          expect(subject.status).to eq 400
+          expect(subject.header['Content-Type']).to include 'text/html'
+        end
       end
 
       context 'with "response_type"' do
@@ -49,7 +64,10 @@ RSpec.describe 'Authorization', type: 'routing' do
             get @url, client_id: Authorization::CLIENT_ID, response_type: 'code'
           end
 
-          it { is_expected.to be_ok }
+          specify do
+            expect(subject.status).to eq 200
+            expect(subject.header['Content-Type']).to include 'text/html'
+          end
         end
 
         context '"token"' do
@@ -63,7 +81,10 @@ RSpec.describe 'Authorization', type: 'routing' do
                         response_type: @response_type
             end
 
-            it { is_expected.to_not be_ok }
+            specify do
+              expect(subject.status).to eq 400
+              expect(subject.header['Content-Type']).to include 'text/html'
+            end
           end
 
           # /authorize?client_id=<value>&response_type=token&redirect_uri=<bad_value>
@@ -74,7 +95,23 @@ RSpec.describe 'Authorization', type: 'routing' do
                         redirect_uri: 'notreal'
             end
 
-            it { is_expected.to_not be_ok }
+            specify do
+              expect(subject.status).to eq 400
+              expect(subject.header['Content-Type']).to include 'text/html'
+            end
+          end
+
+          # /authorize?client_id=<value>&response_type=token&redirect_uri=<value>
+          context 'with incorrect "redirect_uri"' do
+            subject do
+              get @url, client_id: Authorization::CLIENT_ID,
+                        response_type: @response_type,
+                        redirect_uri: Authorization::REDIRECT_URI.to_s
+            end
+
+            specify do
+              expect(subject.status).to eq 200
+            end
           end
         end
       end

@@ -1,3 +1,4 @@
+require 'uri'
 require 'sinatra'
 require File.expand_path('../../helpers/response_helper', __FILE__)
 require File.expand_path('../../lib/authorization', __FILE__)
@@ -6,7 +7,7 @@ require File.expand_path('../../lib/authorization', __FILE__)
 before '/*/?' do
   # Skip these paths
   pass if request.path_info == '/'
-  pass if %w( authorize authorize_submit).include? request.path_info.split('/')[1]
+  pass if %w(authorize authorize_submit).include? request.path_info.split('/')[-1]
 
   # Check the access token
   unless "Bearer #{Authorization::ACCESS_TOKEN}" == request.env['HTTP_AUTHORIZATION']
@@ -34,8 +35,10 @@ before '/authorize/?' do
     bad_request 'Missing redirect_uri (required when "response_type" is "token")'
 
   elsif params['response_type'] == 'token' && params['redirect_uri']
-    if params['redirect_uri'] != Authorization::REDIRECT_URI
-      bad_request "Invalid redirect_uri '#{params['redirect_uri']}'"
+    redirect_uri = URI(params['redirect_uri'])
+
+    if redirect_uri != Authorization::REDIRECT_URI
+      bad_request "Invalid redirect_uri '#{redirect_uri}'"
     end
   end
 end
