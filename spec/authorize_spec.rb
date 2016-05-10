@@ -102,7 +102,7 @@ RSpec.describe 'Authorization', type: 'routing' do
           end
 
           # /authorize?client_id=<value>&response_type=token&redirect_uri=<value>
-          context 'with incorrect "redirect_uri"' do
+          context 'with correct "redirect_uri"' do
             subject do
               get @url, client_id: Authorization::CLIENT_ID,
                         response_type: @response_type,
