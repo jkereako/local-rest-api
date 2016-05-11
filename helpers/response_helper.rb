@@ -8,7 +8,7 @@ def normal_response(message)
 end
 
 def bad_request(message)
-  halt 400, erb(:error, locals: { message: message })
+  halt 400, erb(:error, locals: { title: 'Bad request (400)', message: message })
 end
 
 def unauthorized_request
