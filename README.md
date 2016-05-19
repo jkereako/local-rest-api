@@ -19,16 +19,15 @@ Resolving dependencies...
 ...
 ```
 
-Then run the API
+Then run the API:
 
 ```sh
-$ ruby app.rb
-== Sinatra (v1.4.7) has taken the stage on 4567 for development with backup from Puma
+$ rackup
 Puma starting in single mode...
 * Version 3.4.0 (ruby 2.3.0-p0), codename: Owl Bowl Brawl
 * Min threads: 0, max threads: 16
 * Environment: development
-* Listening on tcp://localhost:4567
+* Listening on tcp://localhost:9292
 Use Ctrl-C to stop
 ```
 
