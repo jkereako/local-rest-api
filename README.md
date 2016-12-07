@@ -5,7 +5,7 @@ This is a simple, local implementation of an OAuth2 API built on [Sinatra]
 Inspired by [Dropbox's API][Dropbox].
 
 # Requirements
-The only hard requirement is Ruby 2.3.0, all other dependencies are declared in
+The only hard requirement is Ruby 2.3.1, all other dependencies are declared in
 [Bundler] fashion.
 
 # Usage
@@ -52,6 +52,29 @@ simple, I statically defined all these data as class constants. Change them as y
 When you request a token from this OAuth2 service, all of the corresponding parameters
 must match what exists in the database (i.e. the class `Authorization`). If there is
 a mis-match or if required fields are missing, then the service will deny the request.
+
+# Troubleshooting
+You might see this error on start-up.
+
+```sh
+local-rest-api master % rackup
+Unable to activate sinatra-1.4.7, because rack-2.0.1 conflicts with rack (~> 1.5) (Gem::ConflictError)
+```
+
+This means you have multiple versions of Rack installed. Remove all versions
+*except* 1.6.5.
+
+```sh
+local-rest-api master % gem uninstall rack
+
+Select gem to uninstall:
+ 1. rack-1.6.5
+ 2. rack-2.0.1
+ 3. All versions
+> 2
+```
+
+Now start the app.
 
 [Sinatra]: http://www.sinatrarb.com/
 [Bundler]: http://bundler.io/
